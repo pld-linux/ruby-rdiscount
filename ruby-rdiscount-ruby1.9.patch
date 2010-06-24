@@ -1,0 +1,11 @@
+--- ruby-discount-1.2.7/ext/rdiscount.c~	2008-08-02 09:08:54.000000000 +0200
++++ ruby-discount-1.2.7/ext/rdiscount.c	2010-06-24 16:29:34.000000000 +0200
+@@ -26,7 +26,7 @@
+     if (rb_funcall(self, id_smart, 0) != Qtrue )
+         flags = flags | MKD_NOPANTS;
+ 
+-    MMIOT *doc = mkd_string(RSTRING(text)->ptr, RSTRING(text)->len, flags);
++    MMIOT *doc = mkd_string(RSTRING_PTR(text), RSTRING_LEN(text), flags);
+     markdown(doc, stream, flags);
+ 
+     fclose(stream);
