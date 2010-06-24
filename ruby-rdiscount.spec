@@ -16,7 +16,7 @@ Patch0:		%{name}-ruby1.9.patch
 Group:		Development/Languages
 URL:		http://github.com/rtomayko/rdiscount
 BuildRequires:	rpmbuild(macros) >= 1.484
-BuildRequires:	ruby >= 1:1.8.6
+BuildRequires:	ruby >= 1:1.9
 BuildRequires:	ruby-modules
 BuildRequires:	setup.rb
 %{?ruby_mod_ver_requires_eq}
