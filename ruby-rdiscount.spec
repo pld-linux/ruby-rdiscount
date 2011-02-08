@@ -17,6 +17,7 @@ Group:		Development/Languages
 URL:		http://github.com/rtomayko/rdiscount
 BuildRequires:	rpmbuild(macros) >= 1.484
 BuildRequires:	ruby >= 1:1.9
+BuildRequires:	ruby-devel
 BuildRequires:	ruby-modules
 BuildRequires:	setup.rb
 %{?ruby_mod_ver_requires_eq}
