@@ -5,15 +5,14 @@
 #
 %define pkgname rdiscount
 Summary:	Discount Markdown Processor for Ruby
-Name:		ruby-rdiscount
-Version:	1.2.7
+Name:		ruby-%{pkgname}
+Version:	2.1.8
 Release:	1
-License:	BSD-style
-Source0:	http://github.com/rtomayko/rdiscount/tarball/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	85edbb9768bfa7e36455dbf8749dccae
-Patch0:		%{name}-ruby1.9.patch
+License:	BSD
+Source0:	https://github.com/davidfstr/rdiscount/archive/%{version}/%{pkgname}-%{version}.tar.gz
+# Source0-md5:	7c8076339ffcbc0be7a76ebd19750fb7
 Group:		Development/Languages
-URL:		http://github.com/rtomayko/rdiscount
+URL:		https://github.com/davidfstr/rdiscount
 BuildRequires:	rpm-rubyprov
 BuildRequires:	rpmbuild(macros) >= 1.665
 BuildRequires:	ruby >= 1:1.9
@@ -64,15 +63,20 @@ ri documentation for %{pkgname}.
 Dokumentacji w formacie ri dla %{pkgname}.
 
 %prep
-%setup -q -c
-mv rtomayko-rdiscount-*/* .
-%patch0 -p1
+%setup -qn %{pkgname}-%{version}
 
 %build
+# make gemspec self-contained
+ruby -r rubygems -e 'spec = eval(File.read("%{pkgname}.gemspec"))
+	File.open("%{pkgname}-%{version}.gemspec", "w") do |file|
+	file.puts spec.to_ruby_for_cache
+end'
+
 cp %{_datadir}/setup.rb .
 
 %{__ruby} setup.rb config \
 	--rbdir=%{ruby_vendorlibdir} \
+	--mandir=%{_mandir}/man1 \
 	--sodir=%{ruby_vendorarchdir}
 
 %{__ruby} setup.rb setup
@@ -85,12 +89,18 @@ rm ri/cache.ri
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_ridir},%{ruby_rdocdir}}
-cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
-cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
-
+install -d $RPM_BUILD_ROOT{%{ruby_specdir},%{ruby_ridir},%{ruby_rdocdir}}
 %{__ruby} setup.rb install \
     --prefix=$RPM_BUILD_ROOT
+cp -p %{pkgname}-%{version}.gemspec $RPM_BUILD_ROOT%{ruby_specdir}
+
+# just does require rdiscount
+%{__rm} $RPM_BUILD_ROOT%{ruby_vendorlibdir}/markdown.rb
+
+cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
+cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man*/*.ronn*
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man*/markdown.7*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -98,13 +108,14 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc COPYING README.markdown
-%{ruby_vendorlibdir}/markdown.rb
 %{ruby_vendorlibdir}/rdiscount.rb
 %attr(755,root,root) %{ruby_vendorarchdir}/rdiscount.so
+%{ruby_specdir}/%{pkgname}-%{version}.gemspec
 
 %files -n rdiscount
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/rdiscount
+%{_mandir}/man1/rdiscount.1*
 
 %files rdoc
 %defattr(644,root,root,755)
