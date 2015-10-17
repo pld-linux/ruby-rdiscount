@@ -14,7 +14,8 @@ Source0:	http://github.com/rtomayko/rdiscount/tarball/v%{version}/%{name}-%{vers
 Patch0:		%{name}-ruby1.9.patch
 Group:		Development/Languages
 URL:		http://github.com/rtomayko/rdiscount
-BuildRequires:	rpmbuild(macros) >= 1.484
+BuildRequires:	rpm-rubyprov
+BuildRequires:	rpmbuild(macros) >= 1.665
 BuildRequires:	ruby >= 1:1.9
 BuildRequires:	ruby-devel
 BuildRequires:	ruby-modules
