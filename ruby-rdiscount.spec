@@ -1,8 +1,12 @@
+#
+# Conditional build:
+%bcond_without	tests		# build without tests
+
 # TODO
 # - rake doc
 #   (in /home/users/z/rpm/BUILD/ruby-discount-1.2.7) hanna --charset utf8 --fmt html --inline-source --line-numbers --main RDiscount --op doc --title 'RDiscount API Documentation' lib/rdiscount.rb lib/markdown.rb sh: hanna: not found
 #   rake aborted!
-#
+
 %define pkgname rdiscount
 Summary:	Discount Markdown Processor for Ruby
 Name:		ruby-%{pkgname}
@@ -80,6 +84,11 @@ cp %{_datadir}/setup.rb .
 	--sodir=%{ruby_vendorarchdir}
 
 %{__ruby} setup.rb setup
+
+%if %{with tests}
+%{__ruby} -r rubygems -Ilib:ext:. \
+	-e 'gem "test-unit"; Dir.glob("test/*_test.rb").sort.each {|f| require f}'
+%endif
 
 rdoc --ri --op ri lib
 rdoc --op rdoc lib
