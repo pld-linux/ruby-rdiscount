@@ -13,7 +13,7 @@ Summary:	Discount Markdown Processor for Ruby
 Summary(pl.UTF-8):	Discount (procesor języka Markdown) dla języka Ruby
 Name:		ruby-%{pkgname}
 Version:	2.1.8
-Release:	2
+Release:	3
 License:	BSD
 Source0:	https://github.com/davidfstr/rdiscount/archive/%{version}/%{pkgname}-%{version}.tar.gz
 # Source0-md5:	7c8076339ffcbc0be7a76ebd19750fb7
