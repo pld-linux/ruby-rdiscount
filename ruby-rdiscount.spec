@@ -20,7 +20,6 @@ Source0:	https://github.com/davidfstr/rdiscount/archive/%{version}/%{pkgname}-%{
 # Source0-md5:	11b5061786a57da45052e8d02ef77c5a
 Group:		Development/Languages
 URL:		https://github.com/davidfstr/rdiscount
-BuildRequires:	gmp-devel
 BuildRequires:	rpm-rubyprov
 BuildRequires:	rpmbuild(macros) >= 1.665
 BuildRequires:	ruby >= 1:1.9
