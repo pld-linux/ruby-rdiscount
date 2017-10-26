@@ -26,6 +26,9 @@ BuildRequires:	ruby >= 1:1.9
 BuildRequires:	ruby-devel
 BuildRequires:	ruby-modules
 BuildRequires:	setup.rb >= 3.4.1-6
+%if %{with tests}
+BuildRequires:	ruby-test-unit
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
