@@ -1,9 +1,10 @@
 #
 # Conditional build:
 %bcond_without	tests		# build without tests
+%bcond_without	doc			# don't build ri/rdoc
 
 # TODO
-# - system libmarkdown (from discount.spec)
+# - system libmarkdown (from discount.spec) >= 2.2.0
 # - rake doc
 #   (in /home/users/z/rpm/BUILD/ruby-discount-1.2.7) hanna --charset utf8 --fmt html --inline-source --line-numbers --main RDiscount --op doc --title 'RDiscount API Documentation' lib/rdiscount.rb lib/markdown.rb sh: hanna: not found
 #   rake aborted!
@@ -12,11 +13,11 @@
 Summary:	Discount Markdown Processor for Ruby
 Summary(pl.UTF-8):	Discount (procesor języka Markdown) dla języka Ruby
 Name:		ruby-%{pkgname}
-Version:	2.1.8
-Release:	4
+Version:	2.2.0.1
+Release:	1
 License:	BSD
 Source0:	https://github.com/davidfstr/rdiscount/archive/%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	7c8076339ffcbc0be7a76ebd19750fb7
+# Source0-md5:	11b5061786a57da45052e8d02ef77c5a
 Group:		Development/Languages
 URL:		https://github.com/davidfstr/rdiscount
 BuildRequires:	rpm-rubyprov
@@ -101,11 +102,13 @@ cp %{_datadir}/setup.rb .
 	-e 'gem "test-unit"; Dir.glob("test/*_test.rb").sort.each {|f| require f}'
 %endif
 
+%if %{with doc}
 rdoc --ri --op ri lib
 rdoc --op rdoc lib
 %{__rm} -r ri/Object
 %{__rm} ri/created.rid
 %{__rm} ri/cache.ri
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -116,11 +119,13 @@ cp -p %{pkgname}-%{version}.gemspec $RPM_BUILD_ROOT%{ruby_specdir}
 
 # just does require rdiscount
 %{__rm} $RPM_BUILD_ROOT%{ruby_vendorlibdir}/markdown.rb
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/markdown.7
 
+%if %{with doc}
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/rdiscount.1.ronn
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/markdown.7
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -137,6 +142,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/rdiscount
 %{_mandir}/man1/rdiscount.1*
 
+%if %{with doc}
 %files rdoc
 %defattr(644,root,root,755)
 %{ruby_rdocdir}/%{name}-%{version}
@@ -144,3 +150,4 @@ rm -rf $RPM_BUILD_ROOT
 %files ri
 %defattr(644,root,root,755)
 %{ruby_ridir}/RDiscount
+%endif
