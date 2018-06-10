@@ -1,7 +1,7 @@
 #
 # Conditional build:
-%bcond_without	tests		# build without tests
-%bcond_without	doc			# don't build ri/rdoc
+%bcond_without	tests	# build without tests
+%bcond_without	doc	# don't build ri/rdoc
 
 # TODO
 # - system libmarkdown (from discount.spec) >= 2.2.0
@@ -52,8 +52,8 @@ Markdown processor.
 Procesor języka znaczników Markdown.
 
 %package rdoc
-Summary:	HTML documentation for %{pkgname}
-Summary(pl.UTF-8):	Dokumentacja w formacie HTML dla pakietu %{pkgname}
+Summary:	HTML documentation for Ruby %{pkgname} module
+Summary(pl.UTF-8):	Dokumentacja w formacie HTML dla modułu %{pkgname} języka Ruby
 Group:		Documentation
 Requires:	ruby >= 1:1.8.7-4
 %if "%{_rpmversion}" >= "5"
@@ -61,14 +61,14 @@ BuildArch:	noarch
 %endif
 
 %description rdoc
-HTML documentation for %{pkgname}.
+HTML documentation for Ruby %{pkgname} module.
 
 %description rdoc -l pl.UTF-8
-Dokumentacja w formacie HTML dla pakietu %{pkgname}.
+Dokumentacja w formacie HTML dla modułu %{pkgname} języka Ruby.
 
 %package ri
-Summary:	ri documentation for %{pkgname}
-Summary(pl.UTF-8):	Dokumentacja w formacie ri dla pakietu %{pkgname}
+Summary:	ri documentation for Ruby %{pkgname} module
+Summary(pl.UTF-8):	Dokumentacja w formacie ri dla modułu %{pkgname} języka Ruby
 Group:		Documentation
 Requires:	ruby
 %if "%{_rpmversion}" >= "5"
@@ -76,10 +76,10 @@ BuildArch:	noarch
 %endif
 
 %description ri
-ri documentation for %{pkgname}.
+ri documentation for Ruby %{pkgname} module.
 
 %description ri -l pl.UTF-8
-Dokumentacji w formacie ri dla pakietu %{pkgname}.
+Dokumentacji w formacie ri dla modułu %{pkgname} języka Ruby.
 
 %prep
 %setup -qn %{pkgname}-%{version}
@@ -116,8 +116,10 @@ rdoc --op rdoc lib
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{ruby_specdir},%{ruby_ridir},%{ruby_rdocdir}}
+
 %{__ruby} setup.rb install \
-    --prefix=$RPM_BUILD_ROOT
+	--prefix=$RPM_BUILD_ROOT
+
 cp -p %{pkgname}-%{version}.gemspec $RPM_BUILD_ROOT%{ruby_specdir}
 
 # just does require rdiscount
