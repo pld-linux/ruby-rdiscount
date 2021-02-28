@@ -56,9 +56,7 @@ Summary:	HTML documentation for Ruby %{pkgname} module
 Summary(pl.UTF-8):	Dokumentacja w formacie HTML dla modułu %{pkgname} języka Ruby
 Group:		Documentation
 Requires:	ruby >= 1:1.8.7-4
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description rdoc
 HTML documentation for Ruby %{pkgname} module.
@@ -71,9 +69,7 @@ Summary:	ri documentation for Ruby %{pkgname} module
 Summary(pl.UTF-8):	Dokumentacja w formacie ri dla modułu %{pkgname} języka Ruby
 Group:		Documentation
 Requires:	ruby
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description ri
 ri documentation for Ruby %{pkgname} module.
