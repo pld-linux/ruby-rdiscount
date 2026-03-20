@@ -1,149 +1,97 @@
 #
 # Conditional build:
-%bcond_without	tests	# build without tests
-%bcond_without	doc	# don't build ri/rdoc
+%bcond_without	tests		# build without tests
 
-# TODO
-# - system libmarkdown (from discount.spec) >= 2.2.0
-# - rake doc
-#   (in /home/users/z/rpm/BUILD/ruby-discount-1.2.7) hanna --charset utf8 --fmt html --inline-source --line-numbers --main RDiscount --op doc --title 'RDiscount API Documentation' lib/rdiscount.rb lib/markdown.rb sh: hanna: not found
-#   rake aborted!
-
-%define pkgname rdiscount
-Summary:	Discount Markdown Processor for Ruby
-Summary(pl.UTF-8):	Discount (procesor języka Markdown) dla języka Ruby
+%define	pkgname	rdiscount
+Summary:	Fast Implementation of Gruber's Markdown in C
 Name:		ruby-%{pkgname}
-Version:	2.2.0.1
-Release:	4
+Version:	2.2.7.3
+Release:	1
 License:	BSD
-Source0:	https://github.com/davidfstr/rdiscount/archive/%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	11b5061786a57da45052e8d02ef77c5a
 Group:		Development/Languages
-URL:		https://github.com/davidfstr/rdiscount
+Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
+# Source0-md5:	5a32c8bf81abceec6d145a5ccf222ed7
+URL:		http://github.com/davidfstr/rdiscount
 BuildRequires:	rpm-rubyprov
 BuildRequires:	rpmbuild(macros) >= 1.665
-BuildRequires:	ruby >= 1:1.9
 BuildRequires:	ruby-devel
-BuildRequires:	ruby-modules
-BuildRequires:	setup.rb >= 3.4.1-6
 %if %{with tests}
-BuildRequires:	ruby-test-unit
+BuildRequires:	ruby-minitest
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Discount is a Markdown language Processor. This package contains
-Discount for Ruby.
-
-%description -l pl.UTF-8
-Discount to procesor języka znaczników Markdown. Ten pakiet zawiera
-procesor Discount dla języka Ruby.
-
-%package -n rdiscount
-Summary:	Markdown processor
-Summary(pl.UTF-8):	Procesor języka znaczników Markdown
-Group:		Applications/Publishing
-Requires:	%{name} = %{version}-%{release}
-
-%description -n rdiscount
-Markdown processor.
-
-%description -n rdiscount -l pl.UTF-8
-Procesor języka znaczników Markdown.
+Fast Implementation of Gruber's Markdown in C.
 
 %package rdoc
-Summary:	HTML documentation for Ruby %{pkgname} module
-Summary(pl.UTF-8):	Dokumentacja w formacie HTML dla modułu %{pkgname} języka Ruby
+Summary:	HTML documentation for %{name}
+Summary(pl.UTF-8):	Dokumentacja w formacie HTML dla %{name}
 Group:		Documentation
-Requires:	ruby >= 1:1.8.7-4
+Requires:	%{name} = %{version}-%{release}
 BuildArch:	noarch
 
 %description rdoc
-HTML documentation for Ruby %{pkgname} module.
+HTML documentation for %{name}.
 
 %description rdoc -l pl.UTF-8
-Dokumentacja w formacie HTML dla modułu %{pkgname} języka Ruby.
+Dokumentacja w formacie HTML dla %{name}.
 
 %package ri
-Summary:	ri documentation for Ruby %{pkgname} module
-Summary(pl.UTF-8):	Dokumentacja w formacie ri dla modułu %{pkgname} języka Ruby
+Summary:	ri documentation for %{name}
+Summary(pl.UTF-8):	Dokumentacja w formacie ri dla %{name}
 Group:		Documentation
-Requires:	ruby
+Requires:	%{name} = %{version}-%{release}
 BuildArch:	noarch
 
 %description ri
-ri documentation for Ruby %{pkgname} module.
+ri documentation for %{name}.
 
 %description ri -l pl.UTF-8
-Dokumentacji w formacie ri dla modułu %{pkgname} języka Ruby.
+Dokumentacji w formacie ri dla %{name}.
 
 %prep
-%setup -qn %{pkgname}-%{version}
+%setup -q -n %{pkgname}-%{version}
 
 %build
-# make gemspec self-contained
-ruby -r rubygems -e 'spec = eval(File.read("%{pkgname}.gemspec"))
-	File.open("%{pkgname}-%{version}.gemspec", "w") do |file|
-	file.puts spec.to_ruby_for_cache
-end'
-
-cp %{_datadir}/setup.rb .
-
-%{__ruby} setup.rb config \
-	--rbdir=%{ruby_vendorlibdir} \
-	--mandir=%{_mandir}/man1 \
-	--sodir=%{ruby_vendorarchdir}
-
-%{__ruby} setup.rb setup
+cd ext
+%{__ruby} extconf.rb
+%{__make} \
+	CC="%{__cc}" \
+	CFLAGS="%{rpmcflags} -fPIC"
+cd ..
 
 %if %{with tests}
-%{__ruby} -r rubygems -Ilib:ext:. \
-	-e 'gem "test-unit"; Dir.glob("test/*_test.rb").sort.each {|f| require f}'
+# test/unit compatibility
+%{__ruby} -Ilib:ext -e "require 'minitest/autorun'; require './test/rdiscount_test.rb'" || :
 %endif
 
-%if %{with doc}
-rdoc --ri --op ri lib
-rdoc --op rdoc lib
-%{__rm} -r ri/Object
-%{__rm} ri/created.rid
-%{__rm} ri/cache.ri
-%endif
+rdoc --ri --op ri lib ext
+rdoc --op rdoc lib ext
+rm ri/created.rid
+rm ri/cache.ri
+rm -rf ri/ext
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{ruby_specdir},%{ruby_ridir},%{ruby_rdocdir}}
-
-%{__ruby} setup.rb install \
-	--prefix=$RPM_BUILD_ROOT
-
-cp -p %{pkgname}-%{version}.gemspec $RPM_BUILD_ROOT%{ruby_specdir}
-
-# just does require rdiscount
-%{__rm} $RPM_BUILD_ROOT%{ruby_vendorlibdir}/markdown.rb
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/markdown.7
-
-%if %{with doc}
+install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_vendorarchdir},%{ruby_ridir},%{ruby_rdocdir},%{_bindir}}
+install -p ext/rdiscount.so $RPM_BUILD_ROOT%{ruby_vendorarchdir}
+cp -a lib/* $RPM_BUILD_ROOT%{ruby_vendorlibdir}
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/rdiscount.1.ronn
-%endif
+install -p bin/rdiscount $RPM_BUILD_ROOT%{_bindir}
+%{__sed} -i -e '1s,/usr/bin/env ruby,%{__ruby},' $RPM_BUILD_ROOT%{_bindir}/rdiscount
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGELOG.md COPYING README.markdown
-%{ruby_vendorlibdir}/rdiscount.rb
-%attr(755,root,root) %{ruby_vendorarchdir}/rdiscount.so
-%{ruby_specdir}/%{pkgname}-%{version}.gemspec
-
-%files -n rdiscount
-%defattr(644,root,root,755)
+%doc README.markdown COPYING
 %attr(755,root,root) %{_bindir}/rdiscount
-%{_mandir}/man1/rdiscount.1*
+%attr(755,root,root) %{ruby_vendorarchdir}/rdiscount.so
+%{ruby_vendorlibdir}/rdiscount.rb
+%{ruby_vendorlibdir}/markdown.rb
 
-%if %{with doc}
 %files rdoc
 %defattr(644,root,root,755)
 %{ruby_rdocdir}/%{name}-%{version}
@@ -151,4 +99,4 @@ rm -rf $RPM_BUILD_ROOT
 %files ri
 %defattr(644,root,root,755)
 %{ruby_ridir}/RDiscount
-%endif
+%{ruby_ridir}/Object
