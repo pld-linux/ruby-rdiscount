@@ -6,7 +6,7 @@
 Summary:	Fast Implementation of Gruber's Markdown in C
 Name:		ruby-%{pkgname}
 Version:	2.2.7.3
-Release:	2
+Release:	3
 License:	BSD
 Group:		Development/Languages
 Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
