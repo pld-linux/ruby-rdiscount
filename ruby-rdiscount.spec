@@ -1,17 +1,19 @@
 #
 # Conditional build:
-%bcond_without	tests		# build without tests
+%bcond_without	tests		# unit tests
 
 %define	pkgname	rdiscount
 Summary:	Fast Implementation of Gruber's Markdown in C
+Summary(pl.UTF-8):	Szybka implementacja Markdown Grubera w C
 Name:		ruby-%{pkgname}
 Version:	2.2.7.3
-Release:	3
+Release:	4
 License:	BSD
 Group:		Development/Languages
 Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
 # Source0-md5:	5a32c8bf81abceec6d145a5ccf222ed7
 URL:		http://github.com/davidfstr/rdiscount
+BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpm-rubyprov
 BuildRequires:	rpmbuild(macros) >= 1.665
 BuildRequires:	ruby-devel
@@ -22,6 +24,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 Fast Implementation of Gruber's Markdown in C.
+
+%description -l pl.UTF-8
+Szybka implementacja Markdown Grubera w C.
 
 %package rdoc
 Summary:	HTML documentation for %{name}
@@ -74,6 +79,7 @@ rm -rf ri/ext
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_vendorarchdir},%{ruby_ridir},%{ruby_rdocdir},%{_bindir}}
+
 install -p ext/rdiscount.so $RPM_BUILD_ROOT%{ruby_vendorarchdir}
 cp -a lib/* $RPM_BUILD_ROOT%{ruby_vendorlibdir}
 cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
@@ -88,7 +94,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc README.markdown COPYING
 %attr(755,root,root) %{_bindir}/rdiscount
-%attr(755,root,root) %{ruby_vendorarchdir}/rdiscount.so
+%{ruby_vendorarchdir}/rdiscount.so
 %{ruby_vendorlibdir}/rdiscount.rb
 %{ruby_vendorlibdir}/markdown.rb
 
