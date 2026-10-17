@@ -1,5 +1,6 @@
 #
 # Conditional build:
+%bcond_without	doc		# ri/rdoc documentation
 %bcond_without	tests		# unit tests
 
 %define	pkgname	rdiscount
@@ -12,14 +13,15 @@ License:	BSD
 Group:		Development/Languages
 Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
 # Source0-md5:	5a32c8bf81abceec6d145a5ccf222ed7
-URL:		http://github.com/davidfstr/rdiscount
+URL:		https://github.com/davidfstr/rdiscount
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpm-rubyprov
 BuildRequires:	rpmbuild(macros) >= 1.665
-BuildRequires:	ruby-devel
+BuildRequires:	ruby-devel >= 2.7
 %if %{with tests}
 BuildRequires:	ruby-minitest
 %endif
+Obsoletes:	rdiscount < 2.2.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -70,11 +72,13 @@ cd ..
 %{__ruby} -Ilib:ext -e "require 'minitest/autorun'; require './test/rdiscount_test.rb'" || :
 %endif
 
+%if %{with doc}
 rdoc --ri --op ri lib ext
 rdoc --op rdoc lib ext
-rm ri/created.rid
-rm ri/cache.ri
-rm -rf ri/ext
+%{__rm} ri/created.rid
+%{__rm} ri/cache.ri
+%{__rm} -rf ri/ext
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -82,22 +86,30 @@ install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_vendorarchdir},%{ruby_rid
 
 install -p ext/rdiscount.so $RPM_BUILD_ROOT%{ruby_vendorarchdir}
 cp -a lib/* $RPM_BUILD_ROOT%{ruby_vendorlibdir}
-cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
-cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
+
 install -p bin/rdiscount $RPM_BUILD_ROOT%{_bindir}
 %{__sed} -i -e '1s,/usr/bin/env ruby,%{__ruby},' $RPM_BUILD_ROOT%{_bindir}/rdiscount
+
+%if %{with doc}
+cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
+cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
+
+# already in ruby-doc-ri
+%{__rm} $RPM_BUILD_ROOT%{ruby_ridir}/Object/cdesc-Object.ri
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc README.markdown COPYING
+%doc CHANGELOG.md COPYING README.markdown
 %attr(755,root,root) %{_bindir}/rdiscount
 %{ruby_vendorarchdir}/rdiscount.so
 %{ruby_vendorlibdir}/rdiscount.rb
 %{ruby_vendorlibdir}/markdown.rb
 
+%if %{with doc}
 %files rdoc
 %defattr(644,root,root,755)
 %{ruby_rdocdir}/%{name}-%{version}
@@ -105,4 +117,5 @@ rm -rf $RPM_BUILD_ROOT
 %files ri
 %defattr(644,root,root,755)
 %{ruby_ridir}/RDiscount
-%{ruby_ridir}/Object
+%{ruby_ridir}/Object/sized_int-i.ri
+%endif
