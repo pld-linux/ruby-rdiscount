@@ -8,7 +8,7 @@ Summary:	Fast Implementation of Gruber's Markdown in C
 Summary(pl.UTF-8):	Szybka implementacja Markdown Grubera w C
 Name:		ruby-%{pkgname}
 Version:	2.2.7.3
-Release:	4
+Release:	5
 License:	BSD
 Group:		Development/Languages
 Source0:	http://rubygems.org/downloads/%{pkgname}-%{version}.gem
@@ -82,10 +82,11 @@ rdoc --op rdoc lib ext
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_vendorarchdir},%{ruby_ridir},%{ruby_rdocdir},%{_bindir}}
+install -d $RPM_BUILD_ROOT{%{ruby_vendorlibdir},%{ruby_vendorarchdir},%{ruby_specdir},%{ruby_ridir},%{ruby_rdocdir},%{_bindir}}
 
 install -p ext/rdiscount.so $RPM_BUILD_ROOT%{ruby_vendorarchdir}
 cp -a lib/* $RPM_BUILD_ROOT%{ruby_vendorlibdir}
+cp -p %{builddir}/%{pkgname}-%{version}.gemspec $RPM_BUILD_ROOT%{ruby_specdir}
 
 install -p bin/rdiscount $RPM_BUILD_ROOT%{_bindir}
 %{__sed} -i -e '1s,/usr/bin/env ruby,%{__ruby},' $RPM_BUILD_ROOT%{_bindir}/rdiscount
@@ -108,6 +109,7 @@ rm -rf $RPM_BUILD_ROOT
 %{ruby_vendorarchdir}/rdiscount.so
 %{ruby_vendorlibdir}/rdiscount.rb
 %{ruby_vendorlibdir}/markdown.rb
+%{ruby_specdir}/rdiscount-%{version}.gemspec
 
 %if %{with doc}
 %files rdoc
